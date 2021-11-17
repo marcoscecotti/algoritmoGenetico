@@ -1,0 +1,167 @@
+from algoritmoGenetico import algoritmoGenetico
+from algoritmoGenetico2 import algoritmoGenetico2
+from gradienteDescendiente import gradienteDescendiente
+from gradienteDescendiente2 import gradienteDescendiente2
+from matplotlib import pyplot
+import math
+import random
+import numpy as np
+import time
+
+nro_poblacion = 20
+nro_bits_individuo = 20
+nro_seleccion = 10
+nro_competencia = 3
+prob_cruza = 0.9
+prob_mutacion = 0.2
+prob_muta_indiv = 0.1
+porcentaje_brecha = 0.3
+criterio_corte = 0.3
+random.seed(1)
+ventana = 100
+it_max = 100
+min_rango = -512
+max_rango = 512
+fitness_buscado = 418
+metodo_seleccion = 2
+puntoInicialCruzayMuta = 6
+
+def funcion1(x):
+    return -x*math.sin((abs(x))**(1/2))
+
+t=time.time()
+mejor_fitness,valorX = algoritmoGenetico(nro_poblacion, nro_bits_individuo, nro_seleccion, nro_competencia, prob_cruza, prob_mutacion,
+                       it_max, min_rango, max_rango, funcion1, metodo_seleccion,fitness_buscado,puntoInicialCruzayMuta)
+
+print("------------------------")
+print("Algoritmo genético:")
+print("------------------------")
+print("Resultados funcion 1")
+print(-mejor_fitness)
+print(valorX)
+#print("Tiempo: ",time.time()-t)
+print("----------------------------")
+
+min_rango = 0
+max_rango = 20
+fitness_buscado = 9
+metodo_seleccion = 0
+puntoInicialCruzayMuta = 7
+
+def funcion2(x):
+    return x+5*math.sin(3*x)+8*math.cos(5*x)
+
+t=time.time()
+mejor_fitness,valorX = algoritmoGenetico(nro_poblacion, nro_bits_individuo, nro_seleccion, nro_competencia, prob_cruza, prob_mutacion,
+                       it_max, min_rango, max_rango, funcion2, metodo_seleccion,fitness_buscado,puntoInicialCruzayMuta)
+
+print("Resultados funcion 2")
+print(-mejor_fitness)
+print(valorX)
+#print("Tiempo: ",time.time()-t)
+print("----------------------------")
+
+it_max = 1000
+min_rango = -100
+max_rango = 100
+fitness_buscado = -0.5
+metodo_seleccion = 2
+puntoInicialCruzayMuta = 7
+
+def funcion3(x,y):
+    return ((x**2+y**2)**0.25)*(math.sin(50*(x**2+y**2)**0.1)**2+1)
+t=time.time()
+mejor_fitness,valorX,valorY = algoritmoGenetico2(nro_poblacion, nro_bits_individuo, nro_seleccion, nro_competencia, prob_cruza, prob_mutacion,
+                       it_max, min_rango, max_rango, funcion3, metodo_seleccion,fitness_buscado,puntoInicialCruzayMuta)
+
+print("Resultados funcion 3")
+print(mejor_fitness)
+print(valorX)
+print(valorY)
+#print("Tiempo: ",time.time()-t)
+print("------------------------")
+
+print("Gradiente descendiente")
+print("------------------------")
+
+nro_iteraciones = 100000
+alpha = 0.1
+x_inicial = np.random.uniform(-512,512,size=nro_poblacion)
+def gradiente1(x):
+    return -math.sin((abs(x)) ** (1 / 2)) - ((x ** 2 * math.cos((abs(x)) ** (1 / 2))) / (2 * abs(x) * (abs(x)) ** (1 / 2)))
+
+print("Función 1")
+minimoX = np.zeros(nro_poblacion)
+minimo = np.zeros(nro_poblacion)
+for i in range(len(x_inicial)):
+    minimoX[i] = gradienteDescendiente(nro_iteraciones,alpha,x_inicial[i],gradiente1)
+    minimo[i] = funcion1(minimoX[i])
+print("x inicial: ",x_inicial)
+minimoFinal = min(minimo)
+print("Minimo: ",minimoFinal)
+
+#-----------------------------------------------------------------------------------------------------------------------------------#
+
+nro_iteraciones = 10000000
+alpha = 0.00001
+x_inicial = np.random.uniform(0,20,nro_poblacion)
+def gradiente2(x):
+    return 1+15*math.cos(3*x)-40*math.sin(5*x)
+
+print("------------------------")
+print("Función 2")
+minimoX = np.zeros(nro_poblacion)
+minimo = np.zeros(nro_poblacion)
+for i in range(len(x_inicial)):
+    minimoX[i] = gradienteDescendiente(nro_iteraciones,alpha,x_inicial[i],gradiente2)
+    minimo[i] = funcion1(minimoX[i])
+print("x inicial: ",x_inicial)
+minimoFinal = min(minimo)
+print("Minimo: ",minimoFinal)
+
+#-----------------------------------------------------------------------------------------------------------------------------------#
+
+nro_iteraciones = 10000
+alpha = 0.1
+x_inicial = np.random.uniform(-100,100,nro_poblacion)
+y_inicial = np.random.uniform(-100,100,nro_poblacion)
+
+def gradienteX(x,y):
+    return (0.5 * x * (math.sin(50 * (x ** 2 + y ** 2) ** 0.1) ** 2 + 1)) / ((x ** 2 + y ** 2) ** 0.75) \
+           + ( 20 * x * math.cos(50 * (x ** 2 + y ** 2) ** 0.1) * math.sin(50 * (x ** 2 + y ** 2) ** 0.1)) \
+           / (x ** 2 + y ** 2) ** 0.65
+
+def gradienteY(x,y):
+    return (0.5 * y * (math.sin(50 * (x ** 2 + y ** 2) ** 0.1) ** 2 + 1)) / ((x ** 2 + y ** 2) ** 0.75) \
+           + ( 20 * y * math.cos(50 * (x ** 2 + y ** 2) ** 0.1) * math.sin(50 * (x ** 2 + y ** 2) ** 0.1)) \
+           / (x ** 2 + y ** 2) ** 0.65
+
+print("------------------------")
+print("Función 3")
+minimoX = np.zeros(nro_poblacion)
+minimoY = np.zeros(nro_poblacion)
+minimo = np.zeros(nro_poblacion)
+for i in range(len(x_inicial)):
+    minimoX[i],minimoY[i] = gradienteDescendiente2(nro_iteraciones,alpha,x_inicial[i],y_inicial[i],gradienteX,gradienteY)
+    minimo[i] = funcion3(minimoX[i],minimoY[i])
+
+print("(x,y) inicial: ")
+for i in range(len(x_inicial)):
+    print("(",x_inicial[i],",",y_inicial[i],")")
+
+minimoFinal = min(minimo)
+print("Minimo: ",minimoFinal)
+
+pyplot.plot(range(-512,512), [funcion1(i) for i in range(-512,512)])
+pyplot.xlim(-512, 512)
+pyplot.ylim(-512, 512)
+pyplot.axhline(0, color="black")
+pyplot.axvline(0, color="black")
+pyplot.show()
+
+pyplot.plot(np.arange(0,20,0.1), [funcion2(i) for i in np.arange(0,20,0.1)])
+pyplot.xlim(-5, 20)
+pyplot.ylim(-15, 40)
+pyplot.axhline(0, color="black")
+pyplot.axvline(0, color="black")
+pyplot.show()
